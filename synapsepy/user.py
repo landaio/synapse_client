@@ -453,6 +453,30 @@ class User():
 		)
 		return Trans(response)
 
+	def create_batch_trans(self, node_id: str, body: Dict, idempotency_key=None):
+		"""Create a bulk transaction
+        Args:
+            node_id (str): ID of the from Node
+            body (dict): dictionary containing relevent transaction details
+            idempotency_key: (opt) Idempotency key for safely retrying requests
+        Returns:
+            Trans: Trans object containing transaction record
+        """
+		self.logger.debug("Creating batch transaction")
+		path = (
+				paths["users"]
+				+ "/"
+				+ remote_customer.id
+				+ paths["nodes"]
+				+ "/"
+				+ node_id
+				+ "/batch-trans"
+		)
+		response = self._do_request(
+			remote_customer.http.post, path, body, idempotency_key=idempotency_key
+		)
+		return response
+
 	def get_trans(self, node_id, trans_id):
 		'''Retrieves a transaction record from the API
 		Args:
@@ -501,7 +525,7 @@ class User():
 		response = self._do_request(self.http.patch, path, body)
 		return response
 
-	def dispute_trans(self, node_id, trans_id, dispute_reason, dispute_meta={}, certification_date=False, dispute_attachments=[]): 
+	def dispute_trans(self, node_id, trans_id, dispute_reason, dispute_meta={}, certification_date=False, dispute_attachments=[]):
 		'''Disputes a transaction
 		Args:
 			node_id (str): ID of the from Node
@@ -509,7 +533,7 @@ class User():
 			dispute_reason (str): Reason for disputing the transaction
 			dispute_meta (dict): Additional information about dispute
 			dispute_attachments (list): Additional attachements
-			certification_date (int): Epoch timestamp of certification 
+			certification_date (int): Epoch timestamp of certification
 		Returns:
 			dict: dictionary of response from API
 		'''
@@ -527,14 +551,14 @@ class User():
 			+ paths['dispute']
 		)
 		body = { 'dispute_reason': dispute_reason }
-		if dispute_meta: 
-			body['dispute_meta'] = dispute_meta 
+		if dispute_meta:
+			body['dispute_meta'] = dispute_meta
 
-		if certification_date: 
+		if certification_date:
 			body['certification_date'] = certification_date
 
-		if dispute_attachments: 
-			body['dispute_attachments'] = dispute_attachments 
+		if dispute_attachments:
+			body['dispute_attachments'] = dispute_attachments
 
 		response = self._do_request(self.http.patch, path, body)
 		return response
@@ -688,7 +712,7 @@ class User():
 		Args:
 			node_id (str): ID of the Node
 			subnet_id (str): ID of the Subnet
-			per_page (int): Number of card shipments retrieved per page, maximum is 20 
+			per_page (int): Number of card shipments retrieved per page, maximum is 20
 			page (int): Page number of card shipments returned
 		Returns:
 			dict: dictionary of response from API
@@ -712,7 +736,7 @@ class User():
 		return response
 
 	def view_card_shipment(self, node_id, subnet_id, shipment_id):
-		'''View a single card shipment for a subnet by shipment ID 
+		'''View a single card shipment for a subnet by shipment ID
 		Args:
 			node_id (str): ID of the Node
 			subnet_id (str): ID of the Subnet
@@ -892,11 +916,11 @@ class User():
 	def swap_duplicate_user(self, body):
 		self.logger.debug("swapping duplicate users")
 		path = paths['users'] + '/' + self.id + '/swap-duplicate-users'
-		
+
 		response = self._do_request(self.http.patch, path, body)
 		self.body = response
 		return response
-	
+
 
 class Users():
 	def __init__(self, response, http):
