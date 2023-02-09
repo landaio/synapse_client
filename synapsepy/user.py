@@ -453,7 +453,7 @@ class User():
 		)
 		return Trans(response)
 
-	def create_batch_trans(self, node_id: str, body: Dict, idempotency_key=None):
+	def create_batch_trans(self, node_id: str, body, idempotency_key=None):
 		"""Create a bulk transaction
         Args:
             node_id (str): ID of the from Node
